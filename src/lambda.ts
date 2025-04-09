@@ -1,9 +1,11 @@
+import 'reflect-metadata';
 import { Handler } from 'aws-lambda';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as express from 'express';
+import express from 'express';
 import serverlessExpress from '@vendia/serverless-express';
+import './auth/strategies/basic.strategy';
 
 let cachedServer: Handler;
 
@@ -15,9 +17,9 @@ async function bootstrap(): Promise<Handler> {
   return serverlessExpress({ app: expressApp });
 }
 
-export const handler: Handler = async (event, context) => {
+export const handler: Handler = async (event, context, callback) => {
   if (!cachedServer) {
     cachedServer = await bootstrap();
   }
-  return cachedServer(event, context);
+  return cachedServer(event, context, callback);
 };
