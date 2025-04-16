@@ -1,18 +1,16 @@
-# Stage 1: Base image
-FROM node:18-alpine
-
-# Set working directory
+# Stage 1: Build
+FROM node:18-alpine as builder
 WORKDIR /app
-
-# Copy and install only dependencies
 COPY package*.json ./
 RUN npm install
-
-# Install ts-node
-RUN npm install -g ts-node typescript
-
-# Copy entire project (including src/)
 COPY . .
+RUN npm run build
 
-# Run the app with ts-node
-CMD ["ts-node", "src/main.ts"]
+# Stage 2: Runtime
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+RUN npm install --omit=dev
+EXPOSE 4000
+CMD ["node", "dist/main.js"]
