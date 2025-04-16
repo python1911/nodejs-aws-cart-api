@@ -1,0 +1,7 @@
+node_modules
+cdk.out
+.git
+.gitignore
+README.md
+test
+.env
